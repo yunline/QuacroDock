@@ -1,0 +1,169 @@
+body{
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+}
+
+#horizontal_resize_region {
+    position: fixed;
+    opacity: 0%;
+    margin: 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 5px;
+}
+
+#horizontal_resize_region:hover {
+    cursor: ew-resize;
+}
+
+
+#top_bar{
+    background-image: linear-gradient(30deg, #0099FF, #5eabef);
+    height: 50px;
+    z-index: 1;
+    box-shadow: 0px 1px 4px #999;
+    -webkit-app-region: drag;
+}
+
+#top_bar > p{
+    color: white;
+    font-size: 15;
+    margin: 10px;
+    margin-left: 15px;
+}
+
+
+#bottom_bar{
+    height: 50px;
+    background-color: #f0f0f0;
+    box-shadow: 0px -2px 5px #ccc;
+    z-index: 1;
+}
+
+#tab_list{
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    transition: 0.25s ease;
+    z-index: 0;
+}
+
+#tab_list:hover{
+    scrollbar-width: thin;
+}
+
+#tab_list > div{
+    left: 0px;
+    width: 100vw;
+    height: 64px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0px;
+    background-color: #f0f0f0;
+    transition: inherit;
+}
+
+#tab_list > div[active="1"]{
+    background-color: #ddd;
+}
+
+#tab_list > div:hover{
+    background-color: #ccc;
+    cursor: pointer;
+}
+
+
+#tab_list > div > .icon{
+    position: relative;
+    height: 70%;
+    aspect-ratio: 1;
+    margin-left: 10px;
+    margin-right: 10px;
+    flex-shrink: 0;
+    transition: inherit;
+}
+
+#tab_list > div > .icon > img{
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: 0px 1px 4px rgb(80, 80, 80);
+    -webkit-user-drag: none;
+}
+
+#tab_list > div > .icon > .close_btn{
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    height: 16px;
+    filter: grayscale(1) brightness(2);
+    opacity: 0%;
+    transition: inherit;
+}
+#tab_list > div:hover > .icon > .close_btn{
+    opacity: 80%;
+}
+
+#tab_list > div > .icon > .close_btn:hover{
+    filter: none;
+    transform: rotate(90deg);
+}
+
+#tab_list > div > .highlight_bar{
+    width: 5px;
+    height: 100%;
+    flex-shrink: 0;
+    background-color: #00aee8;
+    opacity: 0%;
+    transition: inherit;
+}
+
+#tab_list > div[active="1"] > .highlight_bar {
+    opacity: 100%;
+}
+
+#tab_list > div > .name_label{
+    flex-grow: 1;
+    text-wrap: nowrap;
+    overflow: hidden;
+    mask-image: linear-gradient(270deg, transparent, #000 30%);
+}
+
+@media (min-width: 100px) {
+    /* When dock is wider than 100px */
+    #tab_list > div > .name_label {
+        display: block;
+    }
+    #top_bar > p#title_long{
+        display: block;
+    }
+    #top_bar > p#title_mini{
+        display: none;
+    }
+}
+
+@media (max-width: 100px) {
+    /* When dock is narrower than 100px */
+    #tab_list > div > .name_label {
+        display: none;
+    }
+    #top_bar > p#title_long{
+        display: none;
+    }
+    #top_bar > p#title_mini{
+        display: block;
+    }
+}
+

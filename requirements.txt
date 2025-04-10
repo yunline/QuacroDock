@@ -1,0 +1,4 @@
+pywebview
+pywin32
+types-pywin32
+git+https://github.com/yunline/infi.systray.git@2efe1f68bf491d892f91ea97dec871141f66e470

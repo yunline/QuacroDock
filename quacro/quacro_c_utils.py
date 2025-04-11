@@ -1,7 +1,7 @@
 import ctypes
 import ctypes.wintypes
 
-from .quacro_events import *
+from .quacro_events import Event, EventStop
 
 EVENT_TYPE_STOP = 0
 EVENT_TYPE_CREATE_WND = 1
@@ -61,6 +61,36 @@ _wait_for_hook_event = dll.wait_for_hook_event
 _wait_for_hook_event.argtypes = (ctypes.POINTER(_IPCQueueItem),)
 _wait_for_hook_event.restype = ctypes.c_int
 _wait_for_hook_event.errcheck = error_check
+
+
+class WindowEvent(Event):
+    hwnd: int
+
+    def __init__(self, hwnd):
+        self.hwnd = hwnd
+
+class EventCreateWindow(WindowEvent):
+    pass
+
+class EventDestroyWindow(WindowEvent):
+    pass
+
+class EventMoveSize(WindowEvent):
+    rect: tuple[int, int, int, int]
+
+    def __init__(self, hwnd, rect):
+        super().__init__(hwnd)
+        self.rect = rect
+
+class EventActivate(WindowEvent):
+    inactive: bool
+    minimized: bool
+
+    def __init__(self, hwnd, inactive, minimized):
+        super().__init__(hwnd)
+        self.inactive = bool(inactive)
+        self.minimized = bool(minimized)
+
 
 def wait_for_hook_event() -> Event:
     event = _IPCQueueItem()

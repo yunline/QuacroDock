@@ -13,10 +13,19 @@ from . import (
 )
 
 from .quacro_win32 import format_window
-from .quacro_events import *
+from .quacro_events import (
+    Event,
+    EventStop,
+)
 from .quacro_dock import (
     EventRequestActivateWindow,
     EventRequestCloseWindow,
+)
+from .quacro_c_utils import (
+    EventCreateWindow,
+    EventDestroyWindow,
+    EventMoveSize,
+    EventActivate,
 )
 from .quacro_errors import ConfigError
 
@@ -204,11 +213,9 @@ class WindowManager:
         logger.info(f"Window detected: {format_window(hwnd)}")
     
         dock = self.dock_manager.get_dock_by_window(hwnd, default=None)
-        newly_created = False
         if dock is None:
             key = self.dock_manager.identify_window_key(hwnd)
             dock = self.dock_manager.create_dock(key)
-            newly_created = True
         title = quacro_win32.get_window_title(hwnd)
         dock.create_tab(hwnd, title)
         if dock.resolve_sticking_target():

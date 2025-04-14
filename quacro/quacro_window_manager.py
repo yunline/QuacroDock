@@ -51,6 +51,12 @@ class WindowManager:
         self.window_groups = window_groups
         self.zero_level_groups = zero_level_groups
         self.primary_group = primary_group
+        self.primary_group.register_cb_on_add(
+            self.on_primary_group_add
+        )
+        self.primary_group.register_cb_on_remove(
+            self.on_primary_group_remove
+        )
         self.all_windows = set()
         self.event_loop_ready = threading.Event()
 

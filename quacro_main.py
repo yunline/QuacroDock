@@ -2,6 +2,7 @@ import logging
 import threading
 import os
 import sys
+import tomllib
 
 from quacro import quacro_pywebview_inject
 
@@ -19,6 +20,7 @@ from quacro import (
     quacro_window_manager,
     quacro_config,
 )
+from quacro.quacro_errors import ConfigError
 
 quacro_app_data.init_app_data()
 
@@ -48,9 +50,45 @@ else:
 quacro_app_data.extract_hook_proc_dll()
 quacro_c_utils.load_hook_proc_dll(quacro_app_data.HP_DLL_PATH)
 
-cfg = quacro_config.Config.load_config("quacro_config.toml")
+try:
+    config_file = open("quacro_config.toml","rb")
+except FileNotFoundError as err:
+    logger.error(f"{type(err).__name__}: {err}")
+    quacro_win32.fatal_msgbox("Config file 'quacro_config.toml' is not found")
+    raise SystemExit
+
+try:
+    cfg_raw = tomllib.load(config_file)
+except tomllib.TOMLDecodeError as err:
+    logger.error(f"{type(err).__name__}: {err}")
+    quacro_win32.fatal_msgbox(
+        f"Unable to docode config 'quacro_config.toml':\n{err}"
+    )
+    raise SystemExit
+finally:
+    config_file.close()
+
+try:
+    cfg = quacro_config.Config.load_config(cfg_raw)
+except ConfigError as err:
+    logger.error(f"{type(err).__name__}: {err}")
+    quacro_win32.fatal_msgbox(
+        f"Invalid config:\n"
+        f"In 'quacro_config.toml':\n{err}"
+    )
+    raise SystemExit
+try:
+    window_filter_config = cfg.load_window_filter_config()
+except ConfigError as err:
+    logger.error(f"{type(err).__name__}: {err}")
+    quacro_win32.fatal_msgbox(
+        f"Invalid window group config:\n"
+        f"In 'quacro_config.toml', [window_group]:\n{err}"
+    )
+    raise SystemExit
+
 window_manager = quacro_window_manager.WindowManager(
-    *cfg.load_window_filter_config()
+    *window_filter_config
 )
 
 dock_manager = window_manager.dock_manager

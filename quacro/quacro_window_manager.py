@@ -28,66 +28,10 @@ from .quacro_c_utils import (
     EventActivate,
 )
 from .quacro_errors import ConfigError
+from .quacro_window_group import WindowGrup
 
 
 logger = logging.getLogger("window")
-
-
-class WindowGrup:
-    filters: list[quacro_window_filters.Filter]
-    source_groups: list["WindowGrup"]
-    sink_groups: list["WindowGrup"]
-    
-    only_filter_when_window_created: bool
-
-    name: str
-    manager: "WindowManager"
-    current_windows: set[int]
-
-    primary: bool
-
-    def __init__(self, name:str, manager:"WindowManager"):
-        self.name = name
-        self.manager = manager
-        self.current_windows = set()
-        self.sink_groups = []
-        self.source_groups = []
-        self.filters = []
-        self.primary = False
-    
-    def filter_window(self, hwnd):
-        for filter_ in self.filters:
-            if not filter_.test(hwnd):
-                return False
-        return True
-
-    
-    def _add_window(self, hwnd):
-        if hwnd in self.current_windows:
-            return
-        if self.filter_window(hwnd):
-            self.current_windows.add(hwnd)
-            if self.primary:
-                self.manager.on_primary_group_add(hwnd, self.current_windows)
-            for group in self.sink_groups:
-                group.add_window(hwnd, self.current_windows)
-    
-    def add_window(self, hwnd:int, all_windows: set[int]):
-        if self.only_filter_when_window_created:
-            self._add_window(hwnd)
-        else:
-            for hwnd in all_windows:
-                self._add_window(hwnd) 
-
-    def remove_window(self, hwnd:int):
-        if hwnd not in self.current_windows:
-            return
-        self.current_windows.remove(hwnd)
-        if self.primary:
-            self.manager.on_primary_group_remove(hwnd, self.current_windows)
-        for group in self.sink_groups:
-            group.remove_window(hwnd)
-        
 
 class WindowManager:
     window_groups: dict[str, WindowGrup]
@@ -121,7 +65,7 @@ class WindowManager:
         has_primary = False
         for name in configs_raw:
             cfg = configs_raw[name]
-            grp = WindowGrup(name, self)
+            grp = WindowGrup(name)
             groups[name] = grp
             if type(cfg) is not dict:
                 raise ConfigError("Type of window group config must be dict")
@@ -134,6 +78,12 @@ class WindowManager:
                         raise ConfigError("Only one group can be set as primary")
                     has_primary = True
                     self.primary_group = grp
+                    self.primary_group.register_cb_on_add(
+                        self.on_primary_group_add
+                    )
+                    self.primary_group.register_cb_on_remove(
+                        self.on_primary_group_remove
+                    )
                     grp.primary = True
         if not has_primary:
             raise ConfigError("No primary group is specified")

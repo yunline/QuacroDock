@@ -1,5 +1,7 @@
 @echo off
 
+call "%VSINSTALLDIR%\VC\Auxiliary\Build\vcvarsall.bat" x64
+
 if not exist ".\build" (
     mkdir ".\build"
 )

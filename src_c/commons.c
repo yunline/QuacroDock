@@ -6,10 +6,11 @@
 #include <stdio.h>
 
 #define EVENT_TYPE_STOP 0
-#define EVENT_TYPE_CREATE_WND 1
-#define EVENT_TYPE_DESTROY_WND 2
-#define EVENT_TYPE_MOVESIZE 3
+#define EVENT_TYPE_CREATE_WINDOW 1
+#define EVENT_TYPE_DESTROY_WINDOW 2
+#define EVENT_TYPE_MOVE_SIZE 3
 #define EVENT_TYPE_ACTIVATE 4
+#define EVENT_TYPE_ICON_TITLE_UPDATE 5
 
 typedef struct {
     int32_t event_type;

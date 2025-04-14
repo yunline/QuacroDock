@@ -4,10 +4,11 @@ import ctypes.wintypes
 from .quacro_events import Event, EventStop
 
 EVENT_TYPE_STOP = 0
-EVENT_TYPE_CREATE_WND = 1
-EVENT_TYPE_DESTROY_WND = 2
-EVENT_TYPE_MOVESIZE = 3
+EVENT_TYPE_CREATE_WINDOW = 1
+EVENT_TYPE_DESTROY_WINDOW = 2
+EVENT_TYPE_MOVE_SIZE = 3
 EVENT_TYPE_ACTIVATE = 4
+EVENT_TYPE_ICON_TITLE_UPDATE = 5
 
 if ctypes.sizeof(ctypes.c_voidp) == 8:
     # 64bit windows
@@ -91,17 +92,19 @@ class EventActivate(WindowEvent):
         self.inactive = bool(inactive)
         self.minimized = bool(minimized)
 
+class EventIconTitleUpdate(WindowEvent):
+    pass
 
 def wait_for_hook_event() -> Event:
     event = _IPCQueueItem()
     event_id = _wait_for_hook_event(ctypes.byref(event))
     if event_id==EVENT_TYPE_STOP:
         return EventStop()
-    if event_id==EVENT_TYPE_CREATE_WND:
+    if event_id==EVENT_TYPE_CREATE_WINDOW:
         return EventCreateWindow(event.hwnd)
-    if event_id==EVENT_TYPE_DESTROY_WND:
+    if event_id==EVENT_TYPE_DESTROY_WINDOW:
         return EventDestroyWindow(event.hwnd)
-    if event_id==EVENT_TYPE_MOVESIZE:
+    if event_id==EVENT_TYPE_MOVE_SIZE:
         rect = (
             event.data.rect.left,
             event.data.rect.top,
@@ -115,6 +118,8 @@ def wait_for_hook_event() -> Event:
             event.data.activate_info.inactive,
             event.data.activate_info.minimized
         )
+    if event_id==EVENT_TYPE_ICON_TITLE_UPDATE:
+        return EventIconTitleUpdate(event.hwnd)
     raise OSError(f"Unknown event type id {event_id}")
 
 send_stop_event = dll.send_stop_event

@@ -32,13 +32,13 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 */
 
 class Tab {
-    constructor(container, tab_name, icon, tab_id) {
+    constructor(container, title, icon, tab_id) {
         this.tab_id = tab_id;
         this.container = container;
 
         this.element = document.createElement("div");
         this.element.setAttribute("active","0");
-        this.element.setAttribute("title", tab_name)
+        this.element.setAttribute("title", title);
 
         let highlight_bar = document.createElement("div");
         highlight_bar.setAttribute("class","highlight_bar");
@@ -63,7 +63,7 @@ class Tab {
 
         this.name_label_element = document.createElement("p");
         this.name_label_element.setAttribute("class","name_label");
-        this.name_label_element.innerText = tab_name;
+        this.name_label_element.innerText = title;
         this.element.appendChild(this.name_label_element);
 
         this.register_events();
@@ -71,6 +71,11 @@ class Tab {
 
     update_icon(icon) {
         this.icon_image_element.setAttribute("src", icon);
+    }
+
+    update_title(title) {
+        this.element.setAttribute("title", title);
+        this.name_label_element.innerText = title;
     }
 
     register_events(){
@@ -139,6 +144,14 @@ class TabList{
         pywebview.api.api_get_icon(tab_id).then(result => {
             if(result) {
                 this.tab_id_map[tab_id].update_icon(result);
+            }
+        })
+    }
+
+    request_get_title(tab_id) {
+        pywebview.api.api_get_title(tab_id).then(result => {
+            if(result) {
+                this.tab_id_map[tab_id].update_title(result);
             }
         })
     }

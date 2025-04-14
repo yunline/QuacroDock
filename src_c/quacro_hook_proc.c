@@ -71,7 +71,7 @@ __declspec(dllexport) LRESULT CALLBACK hook_proc(int nCode, WPARAM wParam, LPARA
     {
         case WM_MOVING:
         case WM_SIZING:
-            event.event_type = EVENT_TYPE_MOVESIZE;
+            event.event_type = EVENT_TYPE_MOVE_SIZE;
             event.hwnd = pMsg->hwnd;
             event.rect = *(RECT *)(pMsg->lParam);
             put_hook_event(&event);
@@ -84,15 +84,20 @@ __declspec(dllexport) LRESULT CALLBACK hook_proc(int nCode, WPARAM wParam, LPARA
             put_hook_event(&event);
             break;
         case WM_CREATE:
-            event.event_type = EVENT_TYPE_CREATE_WND;
+            event.event_type = EVENT_TYPE_CREATE_WINDOW;
             event.hwnd = pMsg->hwnd;
             put_hook_event(&event);
             break;
         case WM_DESTROY:
-            event.event_type = EVENT_TYPE_DESTROY_WND;
+            event.event_type = EVENT_TYPE_DESTROY_WINDOW;
             event.hwnd = pMsg->hwnd;
             put_hook_event(&event);
             break;
+        case WM_SETICON:
+        case WM_SETTEXT:
+            event.event_type = EVENT_TYPE_ICON_TITLE_UPDATE;
+            event.hwnd = pMsg->hwnd;
+            put_hook_event(&event);
         default:
             break;
     }

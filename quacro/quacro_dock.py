@@ -71,8 +71,9 @@ class Dock:
         self.window.expose(self.api_activate_tab)
         self.window.expose(self.api_close_tab)
         self.window.expose(self.api_get_icon)
+        self.window.expose(self.api_get_title)
         self.window.expose(self.api_horizontal_resize)
-    
+
     def _move_inj(self,x,y):
         self._move_no_message(x,y)
         quacro_win32.send_moving_message(self.hwnd)
@@ -136,6 +137,10 @@ class Dock:
         b64_icon = base64.b64encode(icon_png).decode('ascii')
         return "data:image/png;base64," + b64_icon
     
+    def api_get_title(self, tab_id: int):
+        logger.debug(f"Getting title for {tab_id}")
+        return quacro_win32.get_window_title(tab_id)
+
     def api_horizontal_resize(self, x):
         rect = quacro_win32.get_window_rect(self.hwnd)
         if rect is None:
@@ -160,6 +165,13 @@ class Dock:
         self._width = width
         logger.debug(f"{self} resize (w:{width} x:{x_pos})")
         
+    def notify_icon_title_update(self, hwnd):
+        _tab_id = json.dumps(hwnd)
+        js = (
+            f"tab_lst.request_get_icon({_tab_id});"
+            f"tab_lst.request_get_title({_tab_id});"
+        )
+        self.window.evaluate_js(js)
 
     def create_tab(self, hwnd:int, title:str):
         _title = json.dumps(title)

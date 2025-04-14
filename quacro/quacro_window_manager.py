@@ -24,6 +24,7 @@ from .quacro_c_utils import (
     EventDestroyWindow,
     EventMoveSize,
     EventActivate,
+    EventIconTitleUpdate,
 )
 from .quacro_window_group import WindowGrup
 
@@ -134,7 +135,12 @@ class WindowManager:
             dock.update_misc()
             dock.stick_to_target(move_target=True)
             dock.show(raise_dock_to_top=True)
-            
+
+    def on_icon_title_updata(self, event:EventIconTitleUpdate):
+        if event.hwnd not in self.primary_group.current_windows:
+            return
+        dock = self.dock_manager.get_dock_by_window(event.hwnd)
+        dock.notify_icon_title_update(event.hwnd)
     
     def on_dock_activate_tab(self, event:EventRequestActivateWindow):
         logger.info(f"{event.dock} requests to activate: {format_window(event.hwnd)}")
@@ -204,6 +210,8 @@ class WindowManager:
                 self.on_dock_activate_tab(event)
             elif isinstance(event, EventRequestCloseWindow):
                 self.on_dock_close_tab(event)
+            elif isinstance(event, EventIconTitleUpdate):
+                self.on_icon_title_updata(event)
             else:
                 logger.warn(
                     f"Ignoring unknown hook event type '{type(event).__name__}'"

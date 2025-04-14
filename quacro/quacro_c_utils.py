@@ -136,10 +136,10 @@ unins_hook.restype = None
 
 _read_window_icon = dll.read_window_icon
 _read_window_icon.argtypes = (HWND, ctypes.POINTER(ctypes.c_int))
-_read_window_icon.restype = ctypes.POINTER(ctypes.c_uint8)
+_read_window_icon.restype = ctypes.c_void_p
 
 _free_png_buffer = dll.free_png_buffer
-_free_png_buffer.argtypes = (ctypes.POINTER(ctypes.c_uint8),)
+_free_png_buffer.argtypes = (ctypes.c_void_p,)
 _free_png_buffer.restype = None
 
 def read_window_icon(hwnd) -> bytes|None:

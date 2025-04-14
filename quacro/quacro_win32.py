@@ -59,7 +59,7 @@ def get_last_error():
 
 def warn_last_error():
     error_msg = f"Win32 api error: {get_last_error()}"
-    warn_tb(logger ,error_msg, level=4)
+    warn_tb(logger ,error_msg, level=2)
 
 def msgbox(text:str, caption:str|None=None, flags:int=0):
     text_buf = ctypes.create_unicode_buffer(text)

@@ -1,5 +1,5 @@
 import logging
-import tomllib
+import typing
 import threading
 import queue
 
@@ -56,10 +56,7 @@ class WindowManager:
         self.all_windows = set()
         self.event_loop_ready = threading.Event()
 
-    def load_window_filter_toml(self, config_filename:str) -> None:
-        with open(config_filename,"rb") as toml_file:
-            configs_raw = tomllib.load(toml_file)
-
+    def load_window_filter_config(self, configs_raw:dict[str,typing.Any]) -> None:
         groups:dict[str, WindowGrup] = {}
 
         has_primary = False

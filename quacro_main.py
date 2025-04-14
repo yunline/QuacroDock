@@ -17,6 +17,7 @@ from quacro import (
     quacro_c_utils,
     quacro_win32,
     quacro_window_manager,
+    quacro_config,
 )
 
 quacro_app_data.init_app_data()
@@ -47,8 +48,9 @@ else:
 quacro_app_data.extract_hook_proc_dll()
 quacro_c_utils.load_hook_proc_dll(quacro_app_data.HP_DLL_PATH)
 
+cfg = quacro_config.Config.load_config("quacro_config.toml")
 window_manager = quacro_window_manager.WindowManager()
-window_manager.load_window_filter_toml("window_filter.toml")
+window_manager.load_window_filter_config(cfg.window_groups_config_dict)
 
 dock_manager = window_manager.dock_manager
 

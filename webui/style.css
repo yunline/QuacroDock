@@ -75,7 +75,7 @@ body{
     transition: inherit;
 }
 
-#tab_list > div[active="1"]{
+#tab_list > div[active="true"]{
     background-color: #ddd;
 }
 
@@ -84,6 +84,9 @@ body{
     cursor: pointer;
 }
 
+#tab_list > div[moving="true"]{
+    opacity: 30%;
+}
 
 #tab_list > div > .icon{
     position: relative;
@@ -129,7 +132,7 @@ body{
     transition: inherit;
 }
 
-#tab_list > div[active="1"] > .highlight_bar {
+#tab_list > div[active="true"] > .highlight_bar {
     opacity: 100%;
 }
 

@@ -16,10 +16,11 @@ var default_icon_svg = `
 var default_icon = `data:image/svg+xml;charset=utf8,${encodeURIComponent(default_icon_svg)}`;
 const SVG_NS = "http://www.w3.org/2000/svg";
 
+const TAB_DRAG_TYPE = "application/quacro-dock-tab";
 
 // equivalent HTML:
 /* 
-<div title="Tab Name" active="0">
+<div title="Tab Name" active="false" moving="false" draggable="true">
     <div class="highlight_bar"></div>
     <div class="icon">
         <img src=""/>
@@ -37,8 +38,10 @@ class Tab {
         this.container = container;
 
         this.element = document.createElement("div");
-        this.element.setAttribute("active","0");
+        this.element.setAttribute("active","false");
+        this.element.setAttribute("moving","false");
         this.element.setAttribute("title", title);
+        this.element.setAttribute("draggable", "true");
 
         let highlight_bar = document.createElement("div");
         highlight_bar.setAttribute("class","highlight_bar");
@@ -65,7 +68,8 @@ class Tab {
         this.name_label_element.setAttribute("class","name_label");
         this.name_label_element.innerText = title;
         this.element.appendChild(this.name_label_element);
-
+        
+        this.drag_event_counter = 0;
         this.register_events();
     }
 
@@ -82,18 +86,88 @@ class Tab {
         this.element.onclick = (event) => {
             this.container.request_activate_tab(this.tab_id);
         }
+
         this.close_tab_btn.onclick = (event) => {
             event.stopPropagation();
             this.container.request_close_tab(this.tab_id);
         }
+
+        this.element.ondragstart = (event) => {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData(TAB_DRAG_TYPE, "quacro");
+            this.container.dragging_tab = this.element;
+            setTimeout(()=>{
+                // set the moving=true after a tiny delay
+                // by this way, the element sticking to the cursor will have moving=false
+                // ref: https://juejin.cn/post/7174065763865591821
+                this.container.dragging_tab.setAttribute("moving", "true");
+            });   
+        }
+
+        this.element.ondragend = (event) => {
+            event.preventDefault();
+            this.element.setAttribute("moving", "false");
+        }
+
+        this.element.ondragover = (event) => {
+            event.preventDefault();
+            if (this.element===this.container.dragging_tab) {
+                return;
+            }
+            if (!event.dataTransfer.types.includes(TAB_DRAG_TYPE)) {
+                return; // not tab dragging event, return
+            }
+            let rect = this.element.getBoundingClientRect();
+            let y = event.clientY - rect.top;
+            if (y>rect.height/2) {
+                this.container.element.insertBefore(this.container.dragging_tab, this.element.nextSibling);
+                return;
+            }
+            this.container.element.insertBefore(this.container.dragging_tab, this.element);
+        }
+
+        this.element.ondragenter = (event) => {
+            event.preventDefault();
+            this.drag_event_counter++;
+            // only run on the first time
+            // otherwise return
+            if (this.drag_event_counter!==1) {
+                return;
+            }
+            if (!event.dataTransfer.types.includes(TAB_DRAG_TYPE)) {
+                // external drag event
+                this.ext_drag_float_timeout = setTimeout(()=>{
+                    this.container.request_activate_tab(this.tab_id);
+                }, 500); // delay 500 ms
+            }
+        }
+
+        this.element.ondragleave = (event) => {
+            event.preventDefault();
+            this.drag_event_counter--;
+            // only run when counter is 0
+            // otherwise return
+            if (this.drag_event_counter!==0) {
+                return;
+            }
+            if (!event.dataTransfer.types.includes(TAB_DRAG_TYPE)) {
+                // clear ext drag timeout
+                clearTimeout(this.ext_drag_float_timeout);
+            }
+        }
+
+        this.element.ondrop = (event) => {
+            event.preventDefault();
+            this.drag_event_counter=0;
+        }
     }
 
     activate() {
-        this.element.setAttribute("active","1");
+        this.element.setAttribute("active","true");
     }
 
     deactivate() {
-        this.element.setAttribute("active","0");
+        this.element.setAttribute("active","false");
     }
 }
 
@@ -102,6 +176,7 @@ class TabList{
         this.element = document.getElementById("tab_list");
         this.tab_id_map = {};
         this.tab_activated = null;
+        this.dragging_tab = null;
     }    
 
     create_tab(tab_name, tab_id) {

@@ -13,8 +13,10 @@ from . import (
     quacro_win32,
     quacro_web_data,
     quacro_c_utils,
+    quacro_app_data,
 )
 from .quacro_win32 import format_window
+from .quacro_app_data import CACHE_KEY_DOCK_WIDTH
 
 logger = logging.getLogger("dock")
 
@@ -34,6 +36,7 @@ class Dock:
 
     # A valid key should not be None
     _key:Any|None = None
+    _width = DEFAULT_DOCK_WIDTH
 
     tabs: set[int]
     target: int|None = None
@@ -100,7 +103,6 @@ class Dock:
         self.being_destroyed = True
         self.window.destroy()
 
-    _width = DEFAULT_DOCK_WIDTH
     @property
     def width(self): # read-only
         return self._width
@@ -324,6 +326,7 @@ class DockManager:
             new_dock._key = key
         logger.debug(f"{self.pre_created_dock} pre-created")
         logger.info(f"{new_dock} activated")
+        new_dock._width = quacro_app_data.cache_get(CACHE_KEY_DOCK_WIDTH, DEFAULT_DOCK_WIDTH)
         return new_dock
     
     def get_dock_by_window(self, hwnd:int, **kw) -> Dock|Any:
@@ -340,11 +343,12 @@ class DockManager:
         del self.active_docks[dock.hwnd]
         if dock._key is not None:
             del self.key_dock_map[dock._key]
+        quacro_app_data.cache_set(CACHE_KEY_DOCK_WIDTH, dock.width)
         dock._destroy()
         logger.info(f"{dock} destroyed")
     
     def quit(self) -> None:
-        for hwnd in self.active_docks:
-            self.active_docks[hwnd]._destroy()
+        for hwnd in list(self.active_docks.keys()):
+            self.destroy_dock(self.active_docks[hwnd])
         self.pre_created_dock._destroy()
 

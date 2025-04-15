@@ -22,9 +22,10 @@ from quacro import (
 )
 from quacro.quacro_errors import ConfigError
 
+quacro_logging.setup_log_config()
+
 quacro_app_data.init_app_data()
 
-quacro_logging.setup_log_config()
 logger = logging.getLogger("main")
 logger.info("Hello Quacro Dock")
 

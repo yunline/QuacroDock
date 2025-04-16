@@ -75,7 +75,11 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    upx_exclude=[],
+    upx_exclude=[
+        # hook_proc.dll is small enough (4k)
+        # we don't need to compress it
+        'quacro_hook_proc.dll'
+    ],
     runtime_tmpdir=None,
     console=HAS_CONSOLE,
     disable_windowed_traceback=False,

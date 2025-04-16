@@ -1,5 +1,6 @@
 #include "commons.c"
 
+#pragma comment(lib, "kernel32.lib")
 #pragma comment(lib, "user32.lib")
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)

@@ -88,13 +88,10 @@ class WindowManager:
         if dock.target != hwnd:
             return
 
-        # target is destroyed, try to find next target
+        # target is destroyed, show next target
         for candidate in dock.tabs:
             quacro_win32.W32.ShowWindow(candidate, win32con.SW_RESTORE)
-            if dock.resolve_sticking_target():
-                dock.update_misc()
-                dock.stick_to_target(move_target=True)
-                break
+            break
     
     def on_window_move_size(self, event:EventMoveSize) -> None:
         if event.hwnd in self.dock_manager.active_docks:

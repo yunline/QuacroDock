@@ -116,7 +116,10 @@ class WindowManager:
     
     def on_window_activate(self, event:EventActivate) -> None:
         hwnd = event.hwnd
-        
+
+        if hwnd in self.dock_manager.active_docks:
+            return
+
         if hwnd not in self.primary_group.current_windows:
             return
         
@@ -137,8 +140,11 @@ class WindowManager:
             dock.show(raise_dock_to_top=True)
 
     def on_icon_title_updata(self, event:EventIconTitleUpdate):
+        if event.hwnd in self.dock_manager.active_docks:
+            return
         if event.hwnd not in self.primary_group.current_windows:
             return
+        logger.debug(f"Window title/icon updated: {format_window(event.hwnd)}")
         dock = self.dock_manager.get_dock_by_window(event.hwnd)
         dock.notify_icon_title_update(event.hwnd)
     

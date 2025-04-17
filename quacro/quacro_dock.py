@@ -52,8 +52,7 @@ class Dock:
             'QuacroDock',
             hidden=True,
             frameless=True, 
-            resizable=False, 
-            focus=False,
+            resizable=False,
             min_size=(0,0),
             html=quacro_web_data.frontend_html
         )

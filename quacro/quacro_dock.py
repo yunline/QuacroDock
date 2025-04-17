@@ -205,16 +205,6 @@ class Dock:
             if window != self.target:
                 quacro_win32.W32.ShowWindow(window, win32con.SW_MINIMIZE)
 
-    def resolve_sticking_target(self):
-        if not self.tabs:
-            return False
-        fg_window = quacro_win32.W32.GetForegroundWindow()
-        if fg_window not in self.tabs:
-            self.target_lost()
-            return False
-        self.target = fg_window
-        return True
-    
     def set_sticking_target(self,hwnd):
         self.target = hwnd
 

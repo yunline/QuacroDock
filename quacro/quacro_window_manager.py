@@ -70,10 +70,12 @@ class WindowManager:
             dock = self.dock_manager.create_dock(key)
         title = quacro_win32.get_window_title(hwnd)
         dock.create_tab(hwnd, title)
-        if dock.resolve_sticking_target():
+
+        if self.event_loop_ready.is_set():
+            dock.set_sticking_target(hwnd)
             dock.update_misc()
             dock.stick_to_target(move_target=True)
-            dock.show()
+            dock.show(raise_dock_to_top=True)
             
 
     def on_primary_group_remove(self, hwnd:int, all_windows:set[int]) -> None:

@@ -105,6 +105,7 @@ __declspec(dllexport) LRESULT CALLBACK hook_proc(int nCode, WPARAM wParam, LPARA
             event.event_type = EVENT_TYPE_ICON_TITLE_UPDATE;
             event.hwnd = pMsg->hwnd;
             put_hook_event(&event);
+            break;
         case WM_SIZE:
             if (pMsg->wParam!=SIZE_MINIMIZED) {
                 break;
@@ -112,6 +113,7 @@ __declspec(dllexport) LRESULT CALLBACK hook_proc(int nCode, WPARAM wParam, LPARA
             event.event_type = EVENT_TYPE_MINIMIZED;
             event.hwnd = pMsg->hwnd;
             put_hook_event(&event);
+            break;
         default:
             break;
     }

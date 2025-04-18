@@ -9,6 +9,7 @@ EVENT_TYPE_DESTROY_WINDOW = 2
 EVENT_TYPE_MOVE_SIZE = 3
 EVENT_TYPE_ACTIVATE = 4
 EVENT_TYPE_ICON_TITLE_UPDATE = 5
+EVENT_TYPE_MINIMIZED = 6
 
 if ctypes.sizeof(ctypes.c_voidp) == 8:
     # 64bit windows
@@ -95,6 +96,9 @@ class EventActivate(WindowEvent):
 class EventIconTitleUpdate(WindowEvent):
     pass
 
+class EventMinimized(WindowEvent):
+    pass
+
 def wait_for_hook_event() -> Event:
     event = _IPCQueueItem()
     event_id = _wait_for_hook_event(ctypes.byref(event))
@@ -120,6 +124,8 @@ def wait_for_hook_event() -> Event:
         )
     if event_id==EVENT_TYPE_ICON_TITLE_UPDATE:
         return EventIconTitleUpdate(event.hwnd)
+    if event_id==EVENT_TYPE_MINIMIZED:
+        return EventMinimized(event.hwnd)
     raise OSError(f"Unknown event type id {event_id}")
 
 send_stop_event = dll.send_stop_event

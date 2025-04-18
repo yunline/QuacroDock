@@ -25,6 +25,7 @@ from .quacro_c_utils import (
     EventMoveSize,
     EventActivate,
     EventIconTitleUpdate,
+    EventMinimized
 )
 from .quacro_window_group import WindowGrup
 
@@ -122,13 +123,11 @@ class WindowManager:
         if hwnd not in self.primary_group.current_windows:
             return
         
-        dock = self.dock_manager.get_dock_by_window(hwnd)
-
         if event.minimized:
-            logger.debug(f"Window minimized: {format_window(hwnd)}")
-            if dock.target==event.hwnd:
-                dock.target_lost()
+            # minimized is handled in on_window_minimized
             return
+        
+        dock = self.dock_manager.get_dock_by_window(hwnd)
 
         # The window is activated and not minimized
         if not event.inactive: 
@@ -139,8 +138,22 @@ class WindowManager:
             dock.show()
         else:
             logger.debug(f"Window inactivated: {format_window(hwnd)}")
+    
+    def on_window_minimized(self, event:EventMinimized):
+        if event.hwnd in self.dock_manager.active_docks:
+            return
 
-    def on_icon_title_updata(self, event:EventIconTitleUpdate):
+        if event.hwnd not in self.primary_group.current_windows:
+            return
+        logger.debug(f"Window minimized: {format_window(event.hwnd)}")
+        
+        dock = self.dock_manager.get_dock_by_window(event.hwnd)
+
+        if dock.target==event.hwnd:
+            dock.target_lost()
+
+
+    def on_window_icon_title_updata(self, event:EventIconTitleUpdate):
         if event.hwnd in self.dock_manager.active_docks:
             return
         if event.hwnd not in self.primary_group.current_windows:
@@ -218,9 +231,11 @@ class WindowManager:
             elif isinstance(event, EventRequestCloseWindow):
                 self.on_dock_close_tab(event)
             elif isinstance(event, EventIconTitleUpdate):
-                self.on_icon_title_updata(event)
+                self.on_window_icon_title_updata(event)
+            elif isinstance(event, EventMinimized):
+                self.on_window_minimized(event)
             else:
-                logger.warn(
+                logger.warning(
                     f"Ignoring unknown hook event type '{type(event).__name__}'"
                 )
 

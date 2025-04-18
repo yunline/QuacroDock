@@ -11,6 +11,7 @@
 #define EVENT_TYPE_MOVE_SIZE 3
 #define EVENT_TYPE_ACTIVATE 4
 #define EVENT_TYPE_ICON_TITLE_UPDATE 5
+#define EVENT_TYPE_MINIMIZED 6
 
 typedef struct {
     int32_t event_type;

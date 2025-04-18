@@ -35,6 +35,17 @@ if getattr(sys, "frozen", False):
 
 logger.debug(f"Process started, PID:{os.getpid()}")
 
+dll_abi_version = quacro_c_utils.get_dll_abi_version()
+script_abi_version = quacro_c_utils.SCRIPT_ABI_VERSION
+if dll_abi_version!=script_abi_version:
+    error_msg = f"Incompatible abi version. "\
+        f"dll:{dll_abi_version}, script:{script_abi_version}\n"\
+        f"Run .\\build_dll.bat to rebuild dll"
+    logger.error(error_msg)
+    quacro_win32.fatal_msgbox(error_msg)
+    raise SystemExit()
+logger.info(f"ABI version {script_abi_version}")
+
 result = quacro_c_utils.acquire_single_instance_lock()
 if result==quacro_c_utils.ACQUIRE_SILOCK_SUCCESS:
     logger.info("Single instance lock acquired successfully")

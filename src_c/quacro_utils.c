@@ -11,6 +11,7 @@ __declspec(dllexport) int event_queue_init();
 __declspec(dllexport) void event_queue_deinit();
 __declspec(dllexport) int wait_for_hook_event(IPCQueueItem* event);
 __declspec(dllexport) void send_stop_event();
+__declspec(dllexport) void get_abi_version(uint16_t *major, uint16_t *minor, uint16_t *micro);
 __declspec(dllexport) int load_hook_proc_dll(WCHAR *hook_proc_dll_path);
 __declspec(dllexport) int setup_hook();
 __declspec(dllexport) void unins_hook();
@@ -144,6 +145,18 @@ __declspec(dllexport) void send_stop_event() {
     }
 }
 
+__declspec(dllexport) void get_abi_version(uint16_t *major, uint16_t *minor, uint16_t *micro) {
+    if(major){
+        *major = quacro_abi_version.major;
+    }
+    if(minor){
+        *minor = quacro_abi_version.minor;
+    }
+    if(micro){
+        *micro = quacro_abi_version.micro;
+    }
+}
+
 HMODULE hook_proc_dll = NULL;
 HOOKPROC hook_proc = NULL;
 __declspec(dllexport) int load_hook_proc_dll(WCHAR *hook_proc_dll_path) {
@@ -159,24 +172,24 @@ __declspec(dllexport) int load_hook_proc_dll(WCHAR *hook_proc_dll_path) {
         return -1;
     }
 
-    BinaryVersion hook_proc_version;
-    get_version(&hook_proc_version);
+    uint16_t ver_major, ver_minor, ver_micro;
+    get_version(&ver_major, &ver_minor, &ver_micro);
     if (
-        hook_proc_version.major!=binary_version.major||
-        hook_proc_version.minor!=binary_version.minor||
-        hook_proc_version.micro!=binary_version.micro
+        ver_major!=quacro_abi_version.major||
+        ver_minor!=quacro_abi_version.minor||
+        ver_micro!=quacro_abi_version.micro
     ){
         SET_FORMAT_ERROR(
             TEXT(
                 "the version of quacro_hook_proc.dll (%u.%u.%u) "
                 "is not compatible with quacro_utils.dll (%u.%u.%u)"
             ),
-            hook_proc_version.major,
-            hook_proc_version.minor,
-            hook_proc_version.micro,
-            binary_version.major,
-            binary_version.minor,
-            binary_version.micro
+            ver_major,
+            ver_minor,
+            ver_micro,
+            quacro_abi_version.major,
+            quacro_abi_version.minor,
+            quacro_abi_version.micro
         );
         FreeLibrary(dll);
         return -1;

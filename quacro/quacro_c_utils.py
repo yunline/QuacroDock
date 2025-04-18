@@ -3,6 +3,8 @@ import ctypes.wintypes
 
 from .quacro_events import Event, EventStop
 
+SCRIPT_ABI_VERSION = (0, 0, 2)
+
 EVENT_TYPE_STOP = 0
 EVENT_TYPE_CREATE_WINDOW = 1
 EVENT_TYPE_DESTROY_WINDOW = 2
@@ -131,6 +133,24 @@ def wait_for_hook_event() -> Event:
 send_stop_event = dll.send_stop_event
 send_stop_event.argtypes = ()
 send_stop_event.restype = None
+
+_get_abi_version = dll.get_abi_version
+_get_abi_version.argtypes = (
+    ctypes.POINTER(ctypes.c_uint16),
+    ctypes.POINTER(ctypes.c_uint16),
+    ctypes.POINTER(ctypes.c_uint16),
+)
+
+def get_dll_abi_version():
+    major = ctypes.c_uint16(114)
+    minor = ctypes.c_uint16(514)
+    micro = ctypes.c_uint16(1919)
+    _get_abi_version(
+        ctypes.byref(major),
+        ctypes.byref(minor),
+        ctypes.byref(micro),
+    )
+    return (major.value, minor.value, micro.value)
 
 load_hook_proc_dll = dll.load_hook_proc_dll
 load_hook_proc_dll.argtypes = (ctypes.c_wchar_p,)

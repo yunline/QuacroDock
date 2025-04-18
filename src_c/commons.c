@@ -90,11 +90,11 @@ void destroy_ipc_queue() {
 #define IS_TOPLEVEL_WINDOW(hwnd) (!(GetWindowLongPtr(hwnd, GWL_STYLE) & (WS_CHILD|WS_POPUP)))
 
 typedef struct{
-    uint8_t major;
-    uint8_t minor;
-    uint8_t micro;
-} BinaryVersion;
+    uint16_t major;
+    uint16_t minor;
+    uint16_t micro;
+} ABIVersion;
 
-const BinaryVersion binary_version = {0,0,1};
+const ABIVersion quacro_abi_version = {0,0,2};
 
-typedef void (*get_version_fp)(BinaryVersion *);
+typedef void (*get_version_fp)(uint16_t *major, uint16_t *minor, uint16_t *micro);

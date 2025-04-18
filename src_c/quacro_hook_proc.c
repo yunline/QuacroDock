@@ -51,9 +51,15 @@ int put_hook_event(IPCQueueItem *event) {
     return 0;
 }
 
-__declspec(dllexport) void get_version(BinaryVersion *version) {
-    if(version){
-        *version = binary_version;
+__declspec(dllexport) void get_version(uint16_t *major, uint16_t *minor, uint16_t *micro) {
+    if(major){
+        *major = quacro_abi_version.major;
+    }
+    if(minor){
+        *minor = quacro_abi_version.minor;
+    }
+    if(micro){
+        *micro = quacro_abi_version.micro;
     }
 }
 

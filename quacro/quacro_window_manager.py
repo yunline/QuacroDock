@@ -87,13 +87,14 @@ class WindowManager:
 
         if len(dock.tabs)==0:
             self.dock_manager.destroy_dock(dock)
+            return
 
         if dock.target != hwnd:
             return
 
         # target is destroyed, show next target
         for candidate in dock.tabs:
-            quacro_win32.W32.ShowWindow(candidate, win32con.SW_RESTORE)
+            quacro_win32.W32.SwitchToThisWindow(candidate)
             break
     
     def on_window_move_size(self, event:EventMoveSize) -> None:

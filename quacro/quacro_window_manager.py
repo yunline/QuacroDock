@@ -75,7 +75,7 @@ class WindowManager:
             dock.set_sticking_target(hwnd)
             dock.update_misc()
             dock.stick_to_target(move_target=True)
-            dock.show(raise_dock_to_top=True)
+            dock.show()
             
 
     def on_primary_group_remove(self, hwnd:int, all_windows:set[int]) -> None:
@@ -136,7 +136,9 @@ class WindowManager:
             dock.set_sticking_target(hwnd)
             dock.update_misc()
             dock.stick_to_target(move_target=True)
-            dock.show(raise_dock_to_top=True)
+            dock.show()
+        else:
+            logger.debug(f"Window inactivated: {format_window(hwnd)}")
 
     def on_icon_title_updata(self, event:EventIconTitleUpdate):
         if event.hwnd in self.dock_manager.active_docks:

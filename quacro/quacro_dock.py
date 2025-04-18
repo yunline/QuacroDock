@@ -83,15 +83,9 @@ class Dock:
     def hide(self):
         quacro_win32.W32.ShowWindow(self.hwnd, win32con.SW_HIDE)
     
-    def show(self, raise_dock_to_top=False):
+    def show(self):
         """Show the dock with taskbar icon hidden"""
         quacro_win32.W32.ShowWindow(self.hwnd, win32con.SW_SHOWNOACTIVATE)
-        # bring dock to top
-        if raise_dock_to_top:
-            quacro_win32.W32.SwitchToThisWindow(self.hwnd)
-            # switch back to target window
-            if self.target is not None:
-                quacro_win32.W32.SwitchToThisWindow(self.target)
         # hide thr taskbar icon
         style = quacro_win32.W32.GetWindowLong(self.hwnd, win32con.GWL_EXSTYLE)
         style |= win32con.WS_EX_TOOLWINDOW
@@ -154,12 +148,11 @@ class Dock:
         elif width>=DOCK_WIDTH_MAX:
             width = DOCK_WIDTH_MAX
             x_pos = rect.right - width
-        flags = win32con.SWP_NOZORDER
         result = quacro_win32.W32.SetWindowPos(
             self.hwnd, 0,
             x_pos, rect.top,
             width, rect.bottom-rect.top,
-            flags
+            win32con.SWP_NOZORDER|win32con.SWP_ASYNCWINDOWPOS
         )
         if not result:
             raise OSError("Failed to set dock position")
@@ -244,13 +237,15 @@ class Dock:
             0, 0,
             win32con.SWP_NOSIZE|
             win32con.SWP_NOZORDER|
-            win32con.SWP_NOACTIVATE
+            win32con.SWP_NOACTIVATE|
+            win32con.SWP_ASYNCWINDOWPOS
         )
         quacro_win32.W32.SetWindowPos(
             self.hwnd, self.target,
             0, 0,
             self_w, self_h,
-            win32con.SWP_NOMOVE
+            win32con.SWP_NOMOVE|
+            win32con.SWP_ASYNCWINDOWPOS
         )
 
     def move_dock_to_target(self, rect):
@@ -262,7 +257,7 @@ class Dock:
             self.hwnd, self.target,
             pos_x, pos_y,
             size_x, size_y,
-            0
+            win32con.SWP_ASYNCWINDOWPOS
         )
         
 

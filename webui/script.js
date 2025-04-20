@@ -70,6 +70,7 @@ class Tab {
         this.element.appendChild(this.name_label_element);
         
         this.drag_event_counter = 0;
+        this.mouse_hovering = false;
         this.register_events();
     }
 
@@ -160,6 +161,14 @@ class Tab {
             event.preventDefault();
             this.drag_event_counter=0;
         }
+
+        this.element.onmouseenter = (event) => {
+            this.mouse_hovering = true;
+        }
+
+        this.element.onmouseleave = (event) => {
+            this.mouse_hovering = false;
+        }
     }
 
     activate() {
@@ -171,12 +180,17 @@ class Tab {
     }
 }
 
+const MENU_ITEM_KEY_CLOSE = "close";
+const MENU_ITEM_KEY_CLOSE_ALL = "close_all";
+const MENU_ITEM_KEY_CLOSE_OTHERS = "close_others";
+
 class TabList{
     constructor(){
         this.element = document.getElementById("tab_list");
-        this.tab_id_map = {};
+        this.tab_id_map = new Map();
         this.tab_activated = null;
         this.dragging_tab = null;
+        this.last_menued_tab = null;
     }    
 
     create_tab(tab_name, tab_id) {
@@ -187,7 +201,7 @@ class TabList{
         }
         let new_tab = new Tab(this, tab_name, default_icon, tab_id);
         this.element.appendChild(new_tab.element);
-        this.tab_id_map[tab_id] = new_tab;
+        this.tab_id_map.set(tab_id, new_tab);
         this.request_get_icon(tab_id);
         return new_tab;
     }
@@ -195,7 +209,7 @@ class TabList{
     remove_tab(tab_id){
         // Called by python backend
 
-        let to_be_del_tab = this.tab_id_map[tab_id];
+        let to_be_del_tab = this.tab_id_map.get(tab_id);
         if (to_be_del_tab===undefined) {
             throw TypeError(`Invalid tab id ${tab_id}`);
         }
@@ -203,7 +217,7 @@ class TabList{
             this.tab_activated=null;
         }
         this.element.removeChild(to_be_del_tab.element);
-        delete this.tab_id_map[tab_id];
+        this.tab_id_map.delete(tab_id);
     }
 
     activate_tab(tab_id) {
@@ -211,14 +225,55 @@ class TabList{
         if(this.tab_activated!==null) {
             this.tab_activated.deactivate();
         }
-        this.tab_activated = this.tab_id_map[tab_id];
+        this.tab_activated = this.tab_id_map.get(tab_id);
         this.tab_activated.activate();
+    }
+
+    get_context_menu() {
+        // Called by python backend
+        for(const tab of this.tab_id_map.values()) {
+            if (tab.mouse_hovering) {
+                this.last_menued_tab = tab
+                return [
+                    MENU_ITEM_KEY_CLOSE,
+                    MENU_ITEM_KEY_CLOSE_OTHERS,
+                    MENU_ITEM_KEY_CLOSE_ALL
+                ];
+            }
+        }
+        return null;
+    }
+
+    execute_menu_item_cmd(menu_key) {
+        // Called by python backend
+        if (this.last_menued_tab===null) {
+            return;
+        }
+        switch(menu_key) {
+            case MENU_ITEM_KEY_CLOSE:
+                this.request_close_tab(this.last_menued_tab.tab_id);
+                break;
+            case MENU_ITEM_KEY_CLOSE_ALL:
+                for(const tab_id of Array.from(this.tab_id_map.keys())) {
+                    this.request_close_tab(tab_id);
+                }
+                break;
+            case MENU_ITEM_KEY_CLOSE_OTHERS:
+                for(const tab_id of Array.from(this.tab_id_map.keys())) {
+                    if(tab_id===this.last_menued_tab.tab_id) {
+                        continue;
+                    }
+                    this.request_close_tab(tab_id);
+                }
+                break;
+        }
+        this.last_menued_tab = null;
     }
 
     request_get_icon(tab_id) {
         pywebview.api.api_get_icon(tab_id).then(result => {
             if(result) {
-                this.tab_id_map[tab_id].update_icon(result);
+                this.tab_id_map.get(tab_id).update_icon(result);
             }
         })
     }
@@ -226,7 +281,7 @@ class TabList{
     request_get_title(tab_id) {
         pywebview.api.api_get_title(tab_id).then(result => {
             if(result) {
-                this.tab_id_map[tab_id].update_title(result);
+                this.tab_id_map.get(tab_id).update_title(result);
             }
         })
     }

@@ -14,6 +14,7 @@ from . import (
     quacro_web_data,
     quacro_c_utils,
     quacro_app_data,
+    quacro_context_menu
 )
 from .quacro_win32 import format_window
 from .quacro_app_data import CACHE_KEY_DOCK_WIDTH
@@ -108,6 +109,8 @@ class Dock:
     def window_cb_on_loaded(self):
         js = "var tab_lst = new TabList();"
         self.window.evaluate_js(js)
+
+        quacro_context_menu.init_context_menu(self.window)
 
         self.dom_loaded.set()
     

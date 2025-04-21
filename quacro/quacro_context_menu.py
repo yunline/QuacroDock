@@ -16,11 +16,13 @@ from Microsoft.Web.WebView2.Core import CoreWebView2ContextMenuItemKind # type:i
 MENU_ITEM_KEY_CLOSE = "close"
 MENU_ITEM_KEY_CLOSE_ALL = "close_all"
 MENU_ITEM_KEY_CLOSE_OTHERS = "close_others"
+MENU_ITEM_KEY_RELAOD_ICON_TITLE = "reload_icon_title"
 
 menu_item_names = {
-    MENU_ITEM_KEY_CLOSE: "Close",
+    MENU_ITEM_KEY_CLOSE: "Close Tab",
     MENU_ITEM_KEY_CLOSE_ALL: "Close All",
     MENU_ITEM_KEY_CLOSE_OTHERS: "Close Others",
+    MENU_ITEM_KEY_RELAOD_ICON_TITLE: "Reload Icon && Title"
 }
 
 

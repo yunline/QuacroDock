@@ -183,6 +183,7 @@ class Tab {
 const MENU_ITEM_KEY_CLOSE = "close";
 const MENU_ITEM_KEY_CLOSE_ALL = "close_all";
 const MENU_ITEM_KEY_CLOSE_OTHERS = "close_others";
+const MENU_ITEM_KEY_RELAOD_ICON_TITLE = "reload_icon_title";
 
 class TabList{
     constructor(){
@@ -237,7 +238,9 @@ class TabList{
                 return [
                     MENU_ITEM_KEY_CLOSE,
                     MENU_ITEM_KEY_CLOSE_OTHERS,
-                    MENU_ITEM_KEY_CLOSE_ALL
+                    MENU_ITEM_KEY_CLOSE_ALL,
+                    null,
+                    MENU_ITEM_KEY_RELAOD_ICON_TITLE
                 ];
             }
         }
@@ -266,6 +269,11 @@ class TabList{
                     this.request_close_tab(tab_id);
                 }
                 break;
+            case MENU_ITEM_KEY_RELAOD_ICON_TITLE:
+                this.request_get_icon(this.last_menued_tab.tab_id);
+                this.request_get_title(this.last_menued_tab.tab_id);
+                break;
+
         }
         this.last_menued_tab = null;
     }

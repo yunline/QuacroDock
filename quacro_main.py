@@ -19,8 +19,10 @@ from quacro import (
     quacro_win32,
     quacro_window_manager,
     quacro_config,
+    quacro_i18n,
 )
 from quacro.quacro_errors import ConfigError
+from quacro.quacro_i18n import _
 
 quacro_logging.setup_log_config()
 
@@ -35,6 +37,8 @@ if getattr(sys, "frozen", False):
 
 logger.debug(f"Process started, PID:{os.getpid()}")
 
+quacro_i18n.init()
+
 dll_abi_version = quacro_c_utils.get_dll_abi_version()
 script_abi_version = quacro_c_utils.SCRIPT_ABI_VERSION
 if dll_abi_version!=script_abi_version:
@@ -42,8 +46,9 @@ if dll_abi_version!=script_abi_version:
         f"dll:{dll_abi_version}, script:{script_abi_version}\n"\
         f"Run .\\build_dll.bat to rebuild dll"
     logger.error(error_msg)
-    quacro_win32.fatal_msgbox(error_msg)
-    raise SystemExit()
+    # This error is for developers
+    # So we don't use a msgbox
+    raise RuntimeError(error_msg)
 logger.info(f"ABI version {script_abi_version}")
 
 result = quacro_c_utils.acquire_single_instance_lock()

@@ -1,0 +1,10 @@
+[metadata]
+version = [0,0,2]
+language_code = "zh-CN"
+name = "简体中文"
+
+[context_menu]
+close = "关闭标签"
+close_all = "关闭所有"
+close_others = "关闭其他"
+reload_icon_title = "重载图标和标题"

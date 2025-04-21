@@ -37,6 +37,7 @@ class W32:
     MessageBox = ctypes.windll.user32.MessageBoxW
     DwmSetWindowAttribute = ctypes.windll.dwmapi.DwmSetWindowAttribute
     SwitchToThisWindow = ctypes.windll.user32.SwitchToThisWindow
+    GetUserDefaultLocaleName = ctypes.windll.kernel32.GetUserDefaultLocaleName
 
     def __new__(cls,*args,**kwargs):
         raise TypeError("'W32' class can not be instantiated.")
@@ -78,6 +79,18 @@ def info_msgbox(text:str, caption:str|None=None):
 def fatal_msgbox(text:str, caption:str|None=None):
     msgbox(text, caption, flags=win32con.MB_OK|win32con.MB_ICONERROR)
 
+def get_user_defult_local_name():
+    BUF_LEN = 16
+    name = ctypes.create_unicode_buffer(BUF_LEN)
+    str_length = W32.GetUserDefaultLocaleName(
+        ctypes.byref(name),
+        BUF_LEN
+    )
+    if str_length==0:
+        warn_last_error()
+        return ""
+    return name.value
+    
 
 def get_window_thread_process_id(hwnd):
     pid = ctypes.wintypes.DWORD(0)

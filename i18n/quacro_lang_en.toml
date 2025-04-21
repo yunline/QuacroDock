@@ -1,0 +1,10 @@
+[metadata]
+version = [0,0,2]
+language_code = "en"
+name = "English"
+
+[context_menu]
+close = "Close"
+close_all = "Close All"
+close_others = "Close Others"
+reload_icon_title = "Reload Icon && Title"

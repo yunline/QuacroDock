@@ -6,6 +6,7 @@ import webview
 import clr
 
 from .quacro_logging import warn_tb
+from .quacro_i18n import _
 
 logger = logging.getLogger("context_menu")
 
@@ -19,10 +20,10 @@ MENU_ITEM_KEY_CLOSE_OTHERS = "close_others"
 MENU_ITEM_KEY_RELAOD_ICON_TITLE = "reload_icon_title"
 
 menu_item_names = {
-    MENU_ITEM_KEY_CLOSE: "Close Tab",
-    MENU_ITEM_KEY_CLOSE_ALL: "Close All",
-    MENU_ITEM_KEY_CLOSE_OTHERS: "Close Others",
-    MENU_ITEM_KEY_RELAOD_ICON_TITLE: "Reload Icon && Title"
+    MENU_ITEM_KEY_CLOSE: "context_menu.close",
+    MENU_ITEM_KEY_CLOSE_ALL: "context_menu.close_all",
+    MENU_ITEM_KEY_CLOSE_OTHERS: "context_menu.close_others",
+    MENU_ITEM_KEY_RELAOD_ICON_TITLE: "context_menu.reload_icon_title"
 }
 
 
@@ -73,7 +74,7 @@ def init_context_menu(window:webview.Window):
                     continue
 
                 new_item = sender.Environment.CreateContextMenuItem(
-                    menu_item_names.get(menu_item_key, "Unknown Menu Item Key"),
+                    _[menu_item_names.get(menu_item_key, "Unknown Menu Item Key")],
                     None,
                     CoreWebView2ContextMenuItemKind.Command
                 )

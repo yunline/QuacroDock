@@ -148,7 +148,8 @@ tray_icon.start()
 logger.debug("Starting webview")
 webview.start(
     start_threads_after_webview_init,
-    gui="edgechromium"
+    gui="edgechromium",
+    private_mode=False
 )
 
 logger.info("Main thread ended")

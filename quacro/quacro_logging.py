@@ -1,14 +1,26 @@
 import logging
+import logging.handlers
 import traceback
 import sys
 import threading
-
-if __debug__:
-    LOG_LEVEL = logging.DEBUG
-else:
-    LOG_LEVEL = logging.INFO
+from .quacro_app_data import LOG_PATH
 
 def setup_log_config():
+    import os
+    import time
+    log_filename = os.path.join(
+        LOG_PATH, 
+        time.strftime("%Y-%m-%d-%H-%M-%S.log",time.localtime())
+    )
+    handlers = [logging.handlers.WatchedFileHandler(log_filename)]
+
+    if __debug__:
+        LOG_LEVEL = logging.DEBUG
+        handlers.append(logging.StreamHandler())
+    else:
+        LOG_LEVEL = logging.INFO
+        
+    
     logging.addLevelName(logging.DEBUG, "DBG")
     logging.addLevelName(logging.INFO, "INF")
     logging.addLevelName(logging.WARN, "WRN")
@@ -17,6 +29,7 @@ def setup_log_config():
 
     logging.basicConfig(
         level=LOG_LEVEL,
+        handlers=handlers,
         format = '[%(levelname)s] %(name)s: %(message)s'
     )
 

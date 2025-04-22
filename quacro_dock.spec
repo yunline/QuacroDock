@@ -18,8 +18,14 @@ else:
 a = Analysis(
     ['quacro_main.py'],
     pathex=[],
-    binaries=[('quacro_hook_proc.dll','.'),('quacro_utils.dll','.')],
-    datas=[],
+    binaries=[
+        ('quacro_hook_proc.dll','.'),
+        ('quacro_utils.dll','.')
+    ],
+    datas=[
+        ('./i18n/quacro_lang_en.toml','./i18n'),
+        ('./i18n/quacro_lang_zh_cn.toml','./i18n'),
+    ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

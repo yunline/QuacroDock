@@ -5,6 +5,7 @@ import ctypes.wintypes
 import logging
 
 from .quacro_logging import warn_tb
+from .quacro_i18n import _
 
 logger = logging.getLogger('win32')
 
@@ -74,9 +75,13 @@ def msgbox(text:str, caption:str|None=None, flags:int=0):
     )
 
 def info_msgbox(text:str, caption:str|None=None):
+    if caption is None:
+        caption = _["msgbox.caption_info"]
     msgbox(text, caption, flags=win32con.MB_OK|win32con.MB_ICONINFORMATION)
 
 def fatal_msgbox(text:str, caption:str|None=None):
+    if caption is None:
+        caption = _["msgbox.caption_error"]
     msgbox(text, caption, flags=win32con.MB_OK|win32con.MB_ICONERROR)
 
 def get_user_defult_local_name():

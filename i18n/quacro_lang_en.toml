@@ -3,8 +3,18 @@ version = [0,0,2]
 language_code = "en"
 name = "English"
 
+[msgbox]
+caption_error = "Error"
+caption_info = "Info"
+
+[init]
+instance_already_running = "QuacroDock is already running"
+
 [context_menu]
 close = "Close"
 close_all = "Close All"
 close_others = "Close Others"
 reload_icon_title = "Reload Icon && Title"
+
+[tray_menu]
+quit = "Quit"

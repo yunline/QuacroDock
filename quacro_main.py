@@ -54,15 +54,14 @@ logger.info(f"ABI version {script_abi_version}")
 result = quacro_c_utils.acquire_single_instance_lock()
 if result==quacro_c_utils.ACQUIRE_SILOCK_SUCCESS:
     logger.info("Single instance lock acquired successfully")
+elif result==quacro_c_utils.ACQUIRE_SILOCK_OCCUPIED:
+    logger.error(f"Failed to acquire single instance lock: ACQUIRE_SILOCK_OCCUPIED")
+    quacro_win32.info_msgbox(_["init.instance_already_running"])
+    sys.exit()
 else:
-    if result==quacro_c_utils.ACQUIRE_SILOCK_OCCUPIED:
-        error_msg = "An instance of QuacroDock has been running"
-        quacro_win32.info_msgbox(error_msg)
-    else:
-        error_msg = "Failed to acquire single instance lock"
-        quacro_win32.fatal_msgbox(error_msg)
+    error_msg = f"Failed to acquire single instance lock, return code: {result}"
     logger.error(error_msg)
-    raise SystemExit()
+    raise RuntimeError(error_msg)
 
 quacro_app_data.extract_hook_proc_dll()
 quacro_c_utils.load_hook_proc_dll(quacro_app_data.HP_DLL_PATH)
@@ -72,7 +71,7 @@ try:
 except FileNotFoundError as err:
     logger.error(f"{type(err).__name__}: {err}")
     quacro_win32.fatal_msgbox("Config file 'quacro_config.toml' is not found")
-    raise SystemExit
+    sys.exit()
 
 try:
     cfg_raw = tomllib.load(config_file)
@@ -116,7 +115,7 @@ def on_quit(systray: SysTrayIcon):
     systray.shutdown(join=False)
 
 tray_menu_options = (
-    ("Quit", None, on_quit),
+    (_["tray_menu.quit"], None, on_quit),
 )
 
 tray_icon = SysTrayIcon(

@@ -1,4 +1,5 @@
 import typing
+import tomllib
 
 from . import quacro_window_filters
 from .quacro_window_group import WindowGrup
@@ -7,7 +8,15 @@ from .quacro_errors import ConfigError
 class Config:
     window_groups_config_dict:dict
     @classmethod
-    def load_config(cls, config_dict:dict[str, typing.Any]):
+    def load_config(cls, config_path):
+        try:
+            with open(config_path, "rb") as config_file:
+                config_dict = tomllib.load(config_file)
+        except OSError as err:
+            raise ConfigError(f"Unable to open config file:\n{err}")
+        except (tomllib.TOMLDecodeError, UnicodeDecodeError) as err:
+            raise ConfigError(f"Unable to decode config file:\n{err}")
+
         self = cls()
         if "window_groups" not in config_dict:
             raise ConfigError("Section [window_groups] is not exist")

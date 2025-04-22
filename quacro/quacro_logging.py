@@ -1,5 +1,7 @@
 import logging
 import traceback
+import sys
+import threading
 
 if __debug__:
     LOG_LEVEL = logging.DEBUG
@@ -18,6 +20,16 @@ def setup_log_config():
         format = '[%(levelname)s] %(name)s: %(message)s'
     )
 
+def set_except_hook(logger:logging.Logger):
+    def sys_hook(exc_type, exc_value, exc_traceback):
+        tb_list = traceback.format_exception(exc_type, exc_value, exc_traceback)
+        logger.error(f"Unhandled exception:\n{''.join(tb_list)}")
+    sys.excepthook = sys_hook
+    
+    def threading_hook(args):
+        tb_list = traceback.format_exception(args.exc_type, args.exc_value, args.exc_traceback)
+        logger.error(f"Unhandled exception in thread {args.thread.name}:\n{''.join(tb_list)}")
+    threading.excepthook = threading_hook
 
 LOG_TB_LEN = 3
 def warn_tb(logger:logging.Logger, message, level=1):
